@@ -3,5 +3,7 @@ from django.http import HttpResponse
 
 # Create your views here.
 
-def index(request):
-    return render(request, 'loadp5/index.html', {})
+def index(request, type=None):
+    return render(request, 'loadp5/index.html', {
+        'type': type,
+    })
