@@ -25,7 +25,13 @@
 
     <style type='text/css'>
       body {padding: 0; margin: 0;}
-
+      div.buttonclass{position: absolute;}
+      div.buttonclass div.onlybutton{position: relative; border:1px solid red;z-index: 100;}
+      div.buttonclass div.onlybutton div{display: inline-block;}
+      /*div.buttonclass div.onebutton div{z-index: 400;}*/
+      div.buttonclass div.onlyimg{position: absolute;border: 1px solid blue;top:0; z-index: 0;}
+      div.buttonclass div.onlyimg img{display: inline-block;}
+      canvas{z-index: -100;}
     </style>
 
     <script>
@@ -37,6 +43,17 @@
   </head>
 
   <body>
-{#     <div id="myContainer"></div> #}
+    <div class="buttonclass">
+      <div class="onlybutton">
+        <div id='button1'></div>
+        <div id='button2'></div>
+        <div id='button3'></div>
+      </div>
+      <div class="onlyimg">
+          <img src="{% static 'movingbox.png' %}" alt="" style="width:232px; height:140px;" />
+          <img src="{% static 'spreading.png' %}" alt="" style="width:232px; height:140px;" />
+          <img src="{% static 'random.png' %}" alt="" style="width:232px; height:140px;"/>
+      </div>
+    </div>
   </body>
 </html>

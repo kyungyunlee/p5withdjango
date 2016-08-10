@@ -10,7 +10,6 @@ var allSketch = function(q){
   q.fft;
   var allcanvas;
   var reset;
-
     q.beatHoldFrames = 20;
   //what amplitude level can trigger a beat
     q.beatThreshold = 0.4;
@@ -44,16 +43,25 @@ var allSketch = function(q){
 
     s.movingbox();
 
-    button1=q.createButton('sketch1');
-    button1.position(0,0);
+    button1=q.createButton('');
+    button1.parent('button1');
+    button1.size(232,140);
+    button1.style('background','rgba(255,255,255,0)');
+    button1.style('border','0px');
     button1.mousePressed(s.movingbox);
 
-    button2=q.createButton('sketch2');
-    button2.position(60,0);
+    button2=q.createButton('');
+    button2.parent('button2');
+    button2.size(232,140);
+    button2.style('background','rgba(255,255,255,0)');
+    button2.style('border','0px');
     button2.mousePressed(s.spreadingShapes);
 
-    button3=q.createButton('sketch3');
-    button3.position(120,0);
+    button3=q.createButton('');
+    button3.parent('button3');
+    button3.size(232,140);
+    button3.style('background','rgba(255,255,255,0)');
+    button3.style('border','0px');
     button3.mousePressed(s.appearRandomBox);
 
     q.amplitude = new p5.Amplitude();
@@ -449,8 +457,6 @@ var allSketch = function(q){
       }
     }
   }
-
-
   }////////end
 
 
