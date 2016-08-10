@@ -317,3 +317,155 @@ function keyPressed(){
     }
   }
 }
+
+
+
+
+
+
+  s.freqcurve = function(){
+    var drawParticle = false;
+  // var numOfPoints=30;
+    var r=255;
+    var g=255;
+    var b=255;
+    var lines=[];
+    q.amp1;
+    // var strokeSlider;
+    q.canvas2;
+
+
+    q.beatHoldFrames = 20;
+  //what amplitude level can trigger a beat
+    q.beatThreshold = 0.4;
+    //when we have a beat, beatcutoff will be reset to 1.1*beatTreshold and then decay
+    q.beatCutOff = 0;
+    q.beatDecayRate = 0.98;
+    q.countFramesSinceLastBeat = 0;
+
+     q.setup = function(){
+
+        lines.push(new q.Lines(r,g,b));
+
+    }
+      q.draw=function(){
+        q.amp1=q.amplitude.getLevel();
+        q.background(20);
+        // q.amp = amplitude.getLevel();
+
+        q.detectBeat(q.amp1);
+        r=q.random(255);
+        g=q.random(255);
+        b=q.random(255);
+        if (drawParticle==true){
+          lines.push(new q.Lines(r,g,b));
+        }
+        if (lines.length>4){
+          lines.splice(0,1);
+        }
+        for (var i=0; i<lines.length;i++){
+          lines[i].display();
+        }
+      }
+
+   //for freqcurve
+
+  q.Lines=function(r,g,b){
+      this.op=255;
+      this.lineR=r;
+      this.lineG=g;
+      this.lineB=b;
+      this.history=[];
+
+      this.numOfPoints=30;
+      this.lengthBetweenPoints;
+      this.heightOfPoints=[];
+
+      this.smoothFactor=1;
+      this.sum=[];
+      this.newFreq=[];
+      this.freq;
+
+      for (var i=0;i<this.numOfPoints;i++){
+        this.sum[i]=0;
+        this.newFreq[i]=0;
+        this.heightOfPoints[i]=0;
+      }
+
+      for(var i=0;i<this.numOfPoints;i++){
+          this.history[i]=[];
+        }
+
+      this.display=function(){
+        this.lengthBetweenPoints = (q.windowWidth-100)/this.numOfPoints;
+
+        this.freq = q.fft.analyze();
+        this.range = this.freq.length/this.numOfPoints; //1024/30
+
+        this.col= q.color(this.lineR,this.lineG,this.lineB,this.op);
+        q.stroke(this.col);
+        q.strokeWeight(20);
+        q.noFill();
+        // fill(255,1);
+        q.ellipse(50,q.windowHeight/2,3,3);
+        q.ellipse(q.windowWidth-50, q.windowHeight/2,3,3);
+
+        q.beginShape();
+        q.vertex(50,q.windowHeight/2);
+        q.curveVertex(50,q.windowHeight/2);
+        for(var i=0; i<this.numOfPoints;i++){
+          this.heightOfPoints[i] = q.map(q.fft.getEnergy(this.range*i+1, this.range*i+this.range),0,255,0,q.windowHeight*0.8);
+          q.curveVertex(i*this.lengthBetweenPoints+50, this.heightOfPoints[i]);
+          // ellipse(i*lengthBetweenPoints+50, heightOfPoints[i]+30,1,1);
+          this.history[i].push(this.heightOfPoints[i]);
+        }
+        q.curveVertex(q.windowWidth-50, q.windowHeight/2);
+        q.vertex(q.windowWidth-50, q.windowHeight/2);
+        q.endShape();
+
+
+        for (var i=0;i<this.numOfPoints;i++){
+          if (this.history[i].length>1){
+            this.history[i].splice(0,1);
+          }
+          for (var j=0; j<this.history[i].length;j++){
+            this.op=80*j+10;
+            this.col= q.color(this.lineR,this.lineG,this.lineB,this.op);
+            q.stroke(this.col);
+            q.beginShape();
+            q.vertex(50,q.windowHeight/2);
+            q.curveVertex(50,q.windowHeight/2);
+            for(var k=0; k<this.numOfPoints;k++){
+              q.curveVertex(k*this.lengthBetweenPoints+50, this.history[k][j]);
+            }
+            q.curveVertex(q.windowWidth-50, q.windowHeight/2);
+            q.vertex(q.windowWidth-50, q.windowHeight/2);
+            q.endShape();
+          }
+        }
+      }
+  } ///////q.lines end
+
+
+  q.detectBeat=function(level){
+    if(level>q.beatCutOff && level>q.beatThreshold){
+      backgroundColor = q.color(q.random(255),q.random(255),q.random(255));
+      drawParticle = true;
+      q.beatCutOff = level*1.2;
+      q.countFramesSinceLastBeat=0;
+    }
+    else{
+      drawParticle=false;
+      if(q.countFramesSinceLastBeat <= q.beatHoldFrames){
+        q.countFramesSinceLastBeat++;
+
+      }
+      else{
+        q.beatCutOff *= q.beatDecayRate;
+        q.beatCutOff = Math.max(q.beatCutOff,q.beatThreshold);
+
+    }
+  }
+} ////////detectbeat end
+
+}

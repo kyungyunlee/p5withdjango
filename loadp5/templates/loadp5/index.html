@@ -14,77 +14,29 @@
     <!-- Latest compiled JavaScript -->
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <title>combineSketches</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/p5.js/0.4.23/p5.js"></script>
 
     <script src="{% static 'libraries/p5.js' %}" type="text/javascript"></script>
 
     <script src="{% static 'libraries/p5.sound.js' %}" type="text/javascript"></script>
     <script src="{% static 'libraries/p5.dom.js' %}" type="text/javascript"></script>
-    <script src="{% static 'sketch_temp2.js' %}" type="text/javascript" id='MyJavaScript'></script>
+   <script src="{% static 'sketch_temp2.js' %}" type="text/javascript" id='MyJavaScript'></script>
     <!--<script src="{% static 'sketch1.js' %}" type="text/javascript" id='MyJavaScript'></script>-->
 
-    <style>
+    <style type='text/css'>
       body {padding: 0; margin: 0;}
-      /*canvas {vertical-align: top; position:absolute; left:10; top:10; border: 1px solid black;}*/
-      /*div#sketchholder1{position:absolute; left:10; top:10;}*/
-      button{color:rgb(255,0,0);}
+
     </style>
 
     <script>
+
+
       new p5(allSketch);
-      // new p5(allSketch1);
-      // function changeMyJavaScript(){
-      //   var script = document.getElementById('MyJavaScript');
-      //   // console.log('old:' +script.src);
-      //   // script.src='static/sketch.js';
-      //   // console.log('new: '+script.src);
-      //   console.log('old: '+script.src);
-      //   var newScript=document.createElement('script');
-      //   newScript.type='text/javascript';
-      //   newScript.src='static/sketch.js';
-      //   console.log('new: '+newScript.src);
-      //   $('#sketchholder1').hide();
-      //   $('#sketchholder2').show();
-      //   document.getElementsByTagName('head')[0].appendChild(newScript);
-      // }
-      // (function ($) {
-      //   $.fn.invisible=function(){
-      //     return this.each(function(){
-      //       $(this).css('visibility',"hidden");
-      //     });
-      //   };
-      //   $.fn.visible=function(){
-      //     return this.each(function(){
-      //       $(this).css('visibility','visible');
-      //     });
-      //   };
-      // }(jQuery));
-
-      // $(document).ready(function(){
-      //   $("button#skt1").click(function(){
-      //     $('#sketchholder2').hide();
-      //     $('#sketchholder1').show();
-
-      //     });
-      //   $('button#skt2').click(function(){
-      //     // $('canvas').hide();
-      //     $('#sketchholder1').hide();
-      //     $('#sketchholder2').show();
-      //     // makeitwork2=new p5(callSketch2);
-      //   });
-      // });
 
     </script>
   </head>
-  <body>
-      {# <button id="skt1">sketch1</button> #}
-      {# <button id='skt2'>sketch2</button> #}
-      <button onclick="changeMyJavaScript()">Click</button>
-      <div class='row'>
-        <div id="sketchholder1" class="col-md-12"></div>
-        <div id="sketchholder2" class="col-md-12"></div>
-        <div id="sketchholder3" class="col-md-12"></div>
-        {# <div id="sketchholder1" class="col-md-12"></div> #}
 
-      </div>
+  <body>
+{#     <div id="myContainer"></div> #}
   </body>
 </html>
