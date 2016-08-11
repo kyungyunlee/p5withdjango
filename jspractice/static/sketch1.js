@@ -1,71 +1,80 @@
-s.appearRandomBox=function(){
+s.shootingBall=function(){
+  var ballsize;
+  var shooting_rotateCameraY=0;
+  var ballcolor;
+  var bouncecircle=[];
 
+  q.draw=function(){
+    q.frameRate(20);
+    q.background(20);
+    q.ambientLight(200);
+  // pointLight(200,100,20);
+    q.rotateY(q.radians(-90));
+    q.camera(0,0,500);
 
-var randomBeat=false;
-var randomcol=color(240,10,20);
-var random_rotateCameraX=0;
-var random_rotateCameraY=0;
-
-q.draw=function() {
-  q.background(20);
-  q.ambientLight(200);
-  q.pointLight(200,150,100);
-  q.specularMaterial(randomcol);
-  q.camera(-100,-300,0);
-  q.rotateX(q.radians(10));
-  q.rotateX(q.radians(random_rotateCameraX));
-  q.rotateY(q.radians(random_rotateCameraY));
-
-  var random_timer = q.int(q.millis()/1000);
-  if(random_timer>0){
-    if (random_timer%30==0){
-      random_rotateCameraY -=0.5;
-      random_rotateCameraX -=0.5;
+    q.rotateY(q.radians(shooting_rotateCameraY));
+    var shooting_timer = q.int(q.millis()/1000);
+    if(shooting_timer>0){
+      if (shooting_timer%30==0){
+        shooting_rotateCameraY -=3.5;
+      }
+      else if (shooting_timer%20==0){
+        shooting_rotateCameraY +=1;
+      }
+      else if (shooting_timer%10==0){
+        shooting_rotateCameraY +=1.3;
+      }
     }
-    else if (random_timer%20==0){
-      random_rotateCameraY +=0.2;
-    }
-    else if (random_timer%10==0){
-      random_rotateCameraX +=0.5;
-    }
-  }
+    var shootamp=q.amplitude.getLevel();
+    var shootspeedmult=q.map(shootamp,0,0.8,1,15);
+    ballsize=q.map(shootamp,0.1,0.8,10,120);
+    ballcolor=q.color(q.random(100,200),q.random(100),q.random(50));
 
-  var rand_amp=q.amplitude.getLevel();
-  q.detectBeat(rand_amp);
-
-  if (randomBeat){
-    randombox.push(new q.randomBox(q.random(-800,0),q.random(0,-1000), q.random(20),q.color(q.random(150,255),q.random(0,150),20,200)));
-  }
-  if (randombox.length>20){
-      randombox.splice(0,1);
+    q.detectBeat(shootamp);
+    if (shootamp>0.1){
+      bouncecircle.push(new q.BounceCircle(ballsize,shootspeedmult,ballcolor));
     }
-  if(amp<0.05){
-    randombox.splice(0,randombox.length-1);
-  }
-  for(var i=0; i<randombox.length;i++){
-    randombox[i].display();
-  }
-}
 
-q.detectBeat=function(level){
-  if(level>beatCutOff && level>beatThreshold){
-    backgroundColor = color(random(255),random(255),random(255));
-    boxColor = color(74,143,99);
-    beatCutOff = level*1.2;
-    countFramesSinceLastBeat=0;
-    randomBeat=true;
-  }
-  else{
-    randomBeat=false;
+    for(var i=0;i<bouncecircle.length;i++){
+      q.push();
+      bouncecircle[i].shoot();
+      bouncecircle[i].update();
+      bouncecircle[i].display();
+      q.pop();
+    }
+    if(bouncecircle.length>400){
+      bouncecircle.splice(0,30);
+    }
+  }///////end shootingball.draw()
 
-    boxColor = color(random(20,40), random(100,120), random(140,180));
-    if(countFramesSinceLastBeat <= beatHoldFrames){
-      countFramesSinceLastBeat++;
+  q.BounceCircle=function(ballsize,shootspeedmult,col){
+    this.pos=q.createVector(0,-100,0);
+    this.vel=q.createVector(0,0,0);
+    this.acc=q.createVector(0,0,0);
+    var shootangle=q.random(10,30);
+    var gravity=5;
+    var shootspeed=3;
+    this.shootspeedmult=shootspeedmult;
+    this.ballsize=ballsize;
+    this.col=col;
+
+    this.shoot=function(){//amplitude determines the power of shoot
+      this.vel.x+=q.random(-1,1);
+      this.vel.z=shootspeed*this.shootspeedmult*q.cos(q.radians(shootangle));
+      this.vel.y=-(shootspeed*this.shootspeedmult*q.sin(q.radians(shootangle))-gravity);
     }
-    else{
-      beatCutOff *= beatDecayRate;
-      beatCutOff = Math.max(beatCutOff,beatThreshold);
+    this.update=function(){
+      this.vel.add(this.acc);
+      this.pos.add(this.vel);
+      this.acc.set(0,0);
     }
-  }
-}
-}
+    this.display=function(){
+      q.specularMaterial(this.col);
+      q.push();
+      q.translate(this.pos.x,this.pos.y,this.pos.z);
+      q.sphere(this.ballsize);
+      q.pop();
+    }
+  }/////end bounceCircle
+
+}/////////////end shootingBall

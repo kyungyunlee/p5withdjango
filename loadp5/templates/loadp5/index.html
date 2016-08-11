@@ -25,11 +25,11 @@
 
     <style type='text/css'>
       body {padding: 0; margin: 0;}
-      div.buttonclass{position: absolute;}
-      div.buttonclass div.onlybutton{position: relative; border:1px solid red;z-index: 100;}
+       div.buttonclass{position: absolute;}
+      div.buttonclass div.onlybutton{position: relative; z-index: 100;}
       div.buttonclass div.onlybutton div{display: inline-block;}
-      /*div.buttonclass div.onebutton div{z-index: 400;}*/
-      div.buttonclass div.onlyimg{position: absolute;border: 1px solid blue;top:0; z-index: 0;}
+      div.buttonclass div.onebutton div{z-index: 400;}
+      div.buttonclass div.onlyimg{position: absolute;top:0; z-index: 0;}
       div.buttonclass div.onlyimg img{display: inline-block;}
       canvas{z-index: -100;}
     </style>
@@ -43,16 +43,18 @@
   </head>
 
   <body>
-    <div class="buttonclass">
-      <div class="onlybutton">
+  <div class="buttonclass">
+     <div class="onlybutton">
         <div id='button1'></div>
         <div id='button2'></div>
         <div id='button3'></div>
+        <div id='button4'></div>
       </div>
       <div class="onlyimg">
-          <img src="{% static 'movingbox.png' %}" alt="" style="width:232px; height:140px;" />
-          <img src="{% static 'spreading.png' %}" alt="" style="width:232px; height:140px;" />
-          <img src="{% static 'random.png' %}" alt="" style="width:232px; height:140px;"/>
+          <img src="{% static 'movingbox.png' %}" alt="" style="width:232px; height:140px;" id='button1'/>
+          <img src="{% static 'spreading.png' %}" alt="" style="width:232px; height:140px;" id='button2'/>
+          <img src="{% static 'random.png' %}" alt="" style="width:232px; height:140px;"id='button3'/>
+          <img src="{% static 'shootingball.png' %}" alt="" style="width:232px; height:140px;"id='button4'/>
       </div>
     </div>
   </body>

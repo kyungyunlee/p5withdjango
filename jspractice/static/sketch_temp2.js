@@ -10,13 +10,16 @@ var allSketch = function(q){
   q.fft;
   var allcanvas;
   var reset;
-    q.beatHoldFrames = 20;
-  //what amplitude level can trigger a beat
-    q.beatThreshold = 0.4;
-    //when we have a beat, beatcutoff will be reset to 1.1*beatTreshold and then decay
-    q.beatCutOff = 0;
-    q.beatDecayRate = 0.98;
-    q.countFramesSinceLastBeat = 0;
+  q.beatHoldFrames = 20;
+//what amplitude level can trigger a beat
+  q.beatThreshold = 0.4;
+  //when we have a beat, beatcutoff will be reset to 1.1*beatTreshold and then decay
+  q.beatCutOff = 0;
+  q.beatDecayRate = 0.98;
+  q.countFramesSinceLastBeat = 0;
+
+  ////setup for moving box
+  var onBeat=false;
 
   ///////setup for spreadingline
   q.bouncingspheres=[];
@@ -30,17 +33,12 @@ var allSketch = function(q){
   q.randombox=[];
   var randomBeat=false;
 
-
   q.preload=function(){
-    q.song=q.loadSound('static/assets/lifeincolor.mp3');
+    q.song=q.loadSound('static/assets/colours.mp3');
   }
-
   q.setup=function(){
     q.createCanvas(q.windowWidth,q.windowHeight,q.WEBGL);
-
     q.song.play();
-    q.frameRate(20);
-
     s.movingbox();
 
     button1=q.createButton('');
@@ -64,6 +62,13 @@ var allSketch = function(q){
     button3.style('border','0px');
     button3.mousePressed(s.appearRandomBox);
 
+    button4=q.createButton('');
+    button4.parent('button4');
+    button4.size(232,140);
+    button4.style('background','rgba(255,255,255,0)');
+    button4.style('border','0px');
+    button4.mousePressed(s.shootingBall);
+
     q.amplitude = new p5.Amplitude();
     q.amplitude.setInput(q.song);
 
@@ -71,22 +76,16 @@ var allSketch = function(q){
     q.fft.setInput(q.song);
 
 /////////for spreadingline
-    spreading_rectColor=q.color(0,200,255);
+    spreading_rectColor=q.color(39, 174, 96);
     for (var i=0;i<numOfBouncingCircles;i++){
       bouncingX=20*q.cos(q.random(q.TWO_PI/numOfBouncingCircles*i,q.TWO_PI/numOfBouncingCircles*i+q.TWO_PI/numOfBouncingCircles));
       bouncingY=20*q.sin(q.random(q.TWO_PI/numOfBouncingCircles*i,q.TWO_PI/numOfBouncingCircles*i+q.TWO_PI/numOfBouncingCircles));
       q.bouncingspheres.push(new q.bouncingSphere(bouncingX,bouncingY));
     }
-///////for random box
-  q.randombox.push(new q.randomBox(q.random(-700,0),q.random(0,-700), q.random(20),q.color(q.random(150,255),q.random(0,150),20,200)));
-
   }
-
   q.draw=function(){
     q.background(20);
-
   }
-
 ////////////////////////////////////////////////////////////////
 ///////////////start individual sketches///////////////////////
   var s={};
@@ -98,9 +97,6 @@ var allSketch = function(q){
     var zpos = -500;
     var w = 300;
     var l = 300;
-
-    var onBeat=false;
-
     var sizeSlider;
     var moveCameraY = -300;
     var moveCameraX = 500;
@@ -112,7 +108,7 @@ var allSketch = function(q){
     q.boxColor=q.color(q.random(20,40), q.random(100,120), q.random(140,180));
 
       q.draw=function(){
-
+        q.frameRate(20);
         q.background(20);
         q.ambientLight(150);
         q.pointLight(250, 250, 250, 200, 300, 100);
@@ -132,9 +128,12 @@ var allSketch = function(q){
             moveCameraY +=5;
           }
         }
-
+        q.detectBeat(q.amp);
         q.rotateY(q.radians(angleOfCam));
         q.camera(moveCameraX, moveCameraY, cameraZ);
+        if (onBeat){
+          q.boxColor=q.color(q.random(255),q.random(255),q.random(255));
+        }
 
 
         boxheight = q.map(q.amp, 0, 1, 30, 2000);
@@ -157,6 +156,7 @@ var allSketch = function(q){
             newbox.splice(0,1);
             newbox2.splice(0,1);
           }
+
       }
 
       q.NewBox=function(x,y,z,w,h,l,bc){
@@ -176,7 +176,7 @@ var allSketch = function(q){
        }
       }
 
-  } //////////movingbox end
+  } //////////movingbox end//////////////////////////////
 
 //////////////////////////////////////////////////////////////////
 
@@ -195,7 +195,7 @@ var allSketch = function(q){
       q.background(20);
       q.ambientLight(150,100);
       q.pointLight(200,150,100);
-      q.specularMaterial(0,200,255);
+      q.specularMaterial(spreading_rectColor);
 
       q.rotateX(q.radians(spreading_rotateCameraX));
       q.rotateY(q.radians(spreading_rotateCameraY));
@@ -222,8 +222,12 @@ var allSketch = function(q){
         smallMult=q.map(spreading_amp,0,1,1,5);
 
         if(spreadingOnBeat){
-          console.log('ww')
-          spreading_rectColor=q.color(10,q.random(0,255),q.random(200,255));
+          if(spreading_amp>0.45){
+            spreading_rectColor=q.color(q.random(180,231), q.random(40,80), q.random(40,100));
+            }
+            else{
+            spreading_rectColor=q.color(q.random(60), q.random(140,235), q.random(70,180));
+          }
           spreadingline.push(new q.spreadingLine(spreading_rectColor,smallMult));
         }
 
@@ -343,9 +347,9 @@ var allSketch = function(q){
             q.pop();
           }
         }
-    }///end bouncing sphere///
+    }///end bouncing sphere////////////////////////////////
 
-
+///////////////appearRandomBox start///////////////////////////
     s.appearRandomBox=function(){
       var randomcol=q.color(240,10,20);
       var random_rotateCameraX=0;
@@ -353,12 +357,14 @@ var allSketch = function(q){
       var rand_amp;
 
       q.draw=function() {
+        q.frameRate(20);
         q.background(20);
         q.ambientLight(200);
         q.pointLight(200,150,100);
         q.specularMaterial(randomcol);
-        q.camera(-100,-300,0);
-        q.rotateX(q.radians(10));
+        q.camera(-500,-300,0);
+        q.rotateX(q.radians(5
+           ));
         q.rotateX(q.radians(random_rotateCameraX));
         q.rotateY(q.radians(random_rotateCameraY));
 
@@ -383,24 +389,36 @@ var allSketch = function(q){
             random_rotateCameraX +=0.5;
           }
         }
-        if (randomBeat){
-          console.log('hey')
-          q.randombox.push(new q.randomBox(q.random(-800,0),q.random(0,-1000), q.random(20),q.color(q.random(150,255),q.random(0,150),20,200)));
+
+        if(rand_amp>0.35){
+            q.randombox.push(new q.randomBox(q.random(-1000,0),-200,q.random(-1000,-600), q.random(5,10),q.color(q.random(200,255),q.random(190,240),20,200)));
         }
-        if (q.randombox.length>20){
+        else if(rand_amp>0.2){
+            q.randombox.push(new q.randomBox(q.random(-1000,0),-50,q.random(-600,-300), q.random(10,15),q.color(q.random(170,250),q.random(100,150),20,200)));
+        }
+        else if(rand_amp>0.05 ){
+            q.randombox.push(new q.randomBox(q.random(-1000,0),70,q.random(0,-300), q.random(15,20),q.color(q.random(150,200),q.random(0,40),20,200)));
+        }
+
+        // if(rand_amp>0.003){
+        //     q.randombox.push(new q.randomBox(q.random(-800,0),q.random(0,-1000), q.random(20),q.color(q.random(150,255),q.random(0,150),20,200)));
+        // }
+        if (randomBeat){
+          // q.randombox.push(new q.randomBox(q.random(-800,0),q.random(0,-1000), q.random(20),q.color(q.random(150,255),q.random(0,150),20,200)));
+        }
+        if (q.randombox.length>30){
             q.randombox.splice(0,1);
           }
-        if(rand_amp<0.02){
-          q.randombox.splice(0,q.randombox.length-1);
-        }
-
+        // if(rand_amp<0.02){
+        //   q.randombox.splice(0,q.randombox.length-1);
+        // }
       }
 
-    }////////end random appear box
+    }//////////////end random appear box////////////////////
 
-    q.randomBox=function(x,z,randomnum,col){
+    q.randomBox=function(x,y,z,randomnum,col){
       this.x=x;
-      this.y=0;
+      this.y=y;
       this.z=z;
       this.boxh=10;
       this.numOfRange=20;
@@ -413,7 +431,7 @@ var allSketch = function(q){
         this.range = this.freq.length/this.numOfRange; //1024/30
         this.randomamp=q.amplitude.getLevel();
         // this.boxh=map(randomamp,0,1,10,300);
-        this.boxh=q.map(q.fft.getEnergy(this.range*this.randomnum,this.range*this.randomnum+this.range),0,255,10,300);
+        this.boxh=q.map(q.fft.getEnergy(this.range*this.randomnum,this.range*this.randomnum+this.range),0,255,0,400);
         q.push();
         q.translate(this.x,this.y-this.boxh/2,this.z);
         q.rotateY(q.radians(40));
@@ -422,17 +440,105 @@ var allSketch = function(q){
       }
     }/////////end q.randombox
 
+///////////shootingBall start/////////////////////////////////
+    s.shootingBall=function(){
+      var ballsize;
+      var shooting_rotateCameraY=0;
+      var ballcolor;
+      var bouncecircle=[];
+
+      q.draw=function(){
+        q.frameRate(20);
+        q.background(20);
+        q.ambientLight(200);
+      // pointLight(200,100,20);
+        q.rotateY(q.radians(-90));
+        q.camera(0,0,500);
+
+        q.rotateY(q.radians(shooting_rotateCameraY));
+        var shooting_timer = q.int(q.millis()/1000);
+        if(shooting_timer>0){
+          if (shooting_timer%30==0){
+            shooting_rotateCameraY -=3.5;
+          }
+          else if (shooting_timer%20==0){
+            shooting_rotateCameraY +=1;
+          }
+          else if (shooting_timer%10==0){
+            shooting_rotateCameraY +=1.3;
+          }
+        }
+        var shootamp=q.amplitude.getLevel();
+        var shootspeedmult=q.map(shootamp,0,0.8,1,15);
+        ballsize=q.map(shootamp,0.1,0.8,10,120);
+        ballcolor=q.color(q.random(100,200),q.random(100),q.random(50));
+
+        q.detectBeat(shootamp);
+        if (shootamp>0.1){
+          bouncecircle.push(new q.BounceCircle(ballsize,shootspeedmult,ballcolor));
+        }
+
+        for(var i=0;i<bouncecircle.length;i++){
+          q.push();
+          bouncecircle[i].shoot();
+          bouncecircle[i].update();
+          bouncecircle[i].display();
+          q.pop();
+        }
+        if(bouncecircle.length>400){
+          bouncecircle.splice(0,30);
+        }
+      }///////end shootingball.draw()
+
+      q.BounceCircle=function(ballsize,shootspeedmult,col){
+        this.pos=q.createVector(0,-100,0);
+        this.vel=q.createVector(0,0,0);
+        this.acc=q.createVector(0,0,0);
+        var shootangle=q.random(10,30);
+        var gravity=5;
+        var shootspeed=3;
+        this.shootspeedmult=shootspeedmult;
+        this.ballsize=ballsize;
+        this.col=col;
+
+        this.shoot=function(){//amplitude determines the power of shoot
+          this.vel.x+=q.random(-1,1);
+          this.vel.z=shootspeed*this.shootspeedmult*q.cos(q.radians(shootangle));
+          this.vel.y=-(shootspeed*this.shootspeedmult*q.sin(q.radians(shootangle))-gravity);
+        }
+        this.update=function(){
+          this.vel.add(this.acc);
+          this.pos.add(this.vel);
+          this.acc.set(0,0);
+        }
+        this.display=function(){
+          q.specularMaterial(this.col);
+          q.push();
+          q.translate(this.pos.x,this.pos.y,this.pos.z);
+          q.sphere(this.ballsize);
+          q.pop();
+        }
+      }/////end bounceCircle
+
+    }
+    /////////end shootingBall////////////////////////////////
+
+
     q.detectBeat=function(level){
         if(level>q.beatCutOff && level>q.beatThreshold){
           backgroundColor = q.color(q.random(255),q.random(255),q.random(255));
           spreadingOnBeat = true;
           randomBeat=true;
+          onBeat=true;
           q.beatCutOff = level*1.2;
           q.countFramesSinceLastBeat=0;
         }
         else{
           spreadingOnBeat=false;
           randomBeat=false;
+          onBeat=false;
+          ///for movingbox color
+           q.boxColor=q.color(q.random(20,40), q.random(100,120), q.random(140,180));
           if(q.countFramesSinceLastBeat <= q.beatHoldFrames){
             q.countFramesSinceLastBeat++;
 
